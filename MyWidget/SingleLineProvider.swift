@@ -57,13 +57,17 @@ struct SingleLineProvider: IntentTimelineProvider {
                   with context: Context,
                   completion: @escaping (Timeline<SimpleEntry>) -> ()) {
         let line = self.line(for: configuration)
-        StatusService.getStatus(client: NetworkClient(), for: line) { updates in
-            let entry = SimpleEntry(date: Date(), line: line, updates: updates)
-            let expiryDate = Calendar.current.date(byAdding: .minute, value: 1, to: Date()) ?? Date()
+        StatusService.getStatus(client: NetworkClient(), for: line) {
+            let entry = SimpleEntry(date: Date(), line: line, updates: $0)
+            let expiryDate = Calendar.current.date(byAdding: .minute, value: 2, to: Date()) ?? Date()
             let timeline = Timeline(entries: [entry], policy: .after(expiryDate))
-            completion(timeline)w
+            completion(timeline)
         }
     }
+    
+//    func placeholder(with: Context) -> SimpleEntry {
+//        <#code#>
+//    }
 }
 
 struct SingleLinePlaceholderView : View {
@@ -77,7 +81,7 @@ struct SingleLineWidget: Widget {
         IntentConfiguration(kind: "Single Line",
                             intent: ConfigurationIntent.self,
                             provider: SingleLineProvider(),
-                            placeholder: SingleLinePlaceholderView()) { entry in
+                            placeholder: SingleLinePlaceholderView()) { (entry) in
             ZStack {
                 ZStack {
                     if let update = entry.updates.first {
@@ -88,9 +92,9 @@ struct SingleLineWidget: Widget {
                 }
             }
         }
-            .configurationDisplayName("Line Status")
-            .description("See the status for a specific London Underground line")
-            .supportedFamilies([.systemSmall, .systemMedium])
+        .configurationDisplayName("Line Status")
+        .description("See the status for a specific London Underground line")
+        .supportedFamilies([.systemSmall, .systemMedium])
     }
 }
 

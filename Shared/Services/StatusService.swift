@@ -29,7 +29,7 @@ public struct StatusService {
                     let lineStatus = try decoder.decode([LineStatusUpdate].self, from: data)
                     completion?(lineStatus)
                 } catch {
-                    print(error)
+                    print(error.localizedDescription)
                 }
             case .failure(let error):
                 print(error.localizedDescription)
